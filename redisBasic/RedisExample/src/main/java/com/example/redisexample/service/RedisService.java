@@ -1,6 +1,7 @@
 package com.example.redisexample.service;
 
-import com.example.redisexample.model.Message;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -18,6 +19,7 @@ public class RedisService {
 
     private final RedisTemplate<String, Object> redisTemplate;
     private final StringRedisTemplate stringRedisTemplate;
+    private final ObjectMapper objectMapper;
 
     public Object insertMessage(String key, Object content) {
 
@@ -25,6 +27,7 @@ public class RedisService {
                                         valueOperations.set(key, content);
 
         Object result = valueOperations.get(key);
+
         System.out.println(result);
 
         return result;
@@ -41,6 +44,18 @@ public class RedisService {
         System.out.println(result);
 
         return result;
+    }
+
+    public void setRedisValue(String key, Object content) throws JsonProcessingException {
+
+        redisTemplate.opsForValue().set(key, objectMapper.writeValueAsString(content));
+    }
+
+    public <T> T getRedisValue(String key, Class<T> classType) throws JsonProcessingException {
+
+        String redisValue = (String)redisTemplate.opsForValue().get(key);
+
+        return objectMapper.readValue(redisValue, classType);
     }
 
     public double increment(String key, double count) {
