@@ -1,6 +1,7 @@
 package com.example.redisexample.service;
 
 import com.example.redisexample.model.Message;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,23 @@ class RedisServiceTest {
                 content.setKey("test key");
 
         redisService.insertMessage(key, content);
+    }
+
+    @DisplayName("객체 값 insert, read 테스트")
+    @Test
+    public void insertObjectMessage2() throws JsonProcessingException {
+
+        String key = "content";
+
+        Message content = new Message();
+                content.setContent("test content");
+                content.setKey("test key");
+
+        redisService.setRedisValue(key, content);
+
+        Message result = redisService.getRedisValue(key, Message.class);
+
+        System.out.println(result);
     }
 
     @DisplayName("오직 String 값 insert, read 테스트")
@@ -64,5 +82,4 @@ class RedisServiceTest {
         double score = 0.01;
         redisService.updateDonationRank(key, userNo, score);
     }
-
 }
