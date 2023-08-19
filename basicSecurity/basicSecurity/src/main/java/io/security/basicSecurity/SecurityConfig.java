@@ -26,13 +26,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         http
                 .formLogin()
-                //.loginPage("/loginPage") // 로그인 페이지
+                //.loginPage("/loginPage") // 로그인 페이지, 기본은 login
                 .defaultSuccessUrl("/") //로그인 성공시 이동
                 //.defaultSuccessUrl("/",true) //https://www.inflearn.com/questions/193737/defaultsuccessurl-%EC%9E%91%EB%8F%99-%EC%88%9C%EC%84%9C
                 .failureUrl("/login")//로그인 실패시 이동
                 .usernameParameter("userId")
                 .passwordParameter("passWd")
-                .loginProcessingUrl("/login_proc")
+                .loginProcessingUrl("/login_proc")//기본은 login
                 .successHandler(new AuthenticationSuccessHandler() { // 성공시 이 핸들러 호출
                     @Override
                     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
@@ -44,7 +44,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     @Override
                     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
                         System.out.println("exception = " + exception.getMessage());
-                        response.sendRedirect("/login"); //실패시 이동
+                        response.sendRedirect("/login"); //실패시 로그인 페이지 이동
                     }
                 })
                 .permitAll();//loginPage url 허용
