@@ -25,7 +25,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
              .anyRequest().authenticated();//어떤요청에도 인증을 요구
 
         http
-                .formLogin()
+                .formLogin()//이렇게 api 부를때 UsernamePasswordAuthenticationFilter이 생성된다
                 //.loginPage("/loginPage") // 로그인 페이지, 기본은 login
                 .defaultSuccessUrl("/") //로그인 성공시 이동
                 //.defaultSuccessUrl("/",true) //https://www.inflearn.com/questions/193737/defaultsuccessurl-%EC%9E%91%EB%8F%99-%EC%88%9C%EC%84%9C
