@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -83,5 +84,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .rememberMeParameter("remember")//기본 디폴트 remember-me
                 .tokenValiditySeconds(3600) //기본은 14일이지만 만료시간 1시간 설정
                 .userDetailsService(userDetailsService); //유저 계정 조회
+
+        http.sessionManagement() //동시 세션 제어
+            //.invalidSessionUrl("/invalid")//세션이 유효하지 않을때 이동할 페이지 , 만약 expiredUrl과 둘다 설정시에는 이설정이 우선순위 높음
+            .maximumSessions(1) //세션 개수 1개로 제한 -1은 무한대
+            .maxSessionsPreventsLogin(true);//최대 세션 개수 초과될때의 경우이다 // 디폴트 false이면 기존 세션이 만료된다. true 주면 로그인 자체를 더 못한다.
+            //.expiredUrl("/expired") // 세션이 만료된 경우 이동할 페이지
+
+        http.sessionManagement()//세션 고정 보호 및 세션정책
+            .sessionFixation().changeSessionId()//인증했을때마다 세션 id가 바뀐다. 세션 고정 보호! 디폴트 changeSessionId인데 none 주면 안바뀌어 공격당함
+                //migrateSession = 새로운 세션도 생성되는데 서블릿 3.1이하에서 작동하도록 기본값, newSession = 세션 새롭게 생성되지만, 그 이전의 세션에서 설정한 값들을 새로 설정해야함
+            .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED);
+            //디폴트 IF_REQUIRED =필요시 생성, Always = 항상세션 생성,Never = 생성안하고 이미 존재시 사용, stateless=생성하지 않고, 존재해도 사용안함 JWT 인증시의 경우!
+
     }
 }
