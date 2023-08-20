@@ -1,22 +1,30 @@
 package io.security.basicSecurity;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.logout.LogoutHandler;
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
 @Configuration
 @EnableWebSecurity//웹보안 활성화 위해 추가
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+    @Autowired
+    UserDetailsService userDetailsService;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -47,6 +55,33 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         response.sendRedirect("/login"); //실패시 로그인 페이지 이동
                     }
                 })
-                .permitAll();//loginPage url 허용
+                .permitAll();//loginPage url은 인증 없이 허용
+
+
+        http
+                .logout()
+                .logoutUrl("/logout")  //로그아웃은 기본적을 post 방식으로 처리한다, 기본 디폴트 /logout
+                .logoutSuccessUrl("login")
+                .addLogoutHandler(new LogoutHandler() { //기존에 로그아웃시 핸들러가 동작하면서 각종처리를 하는데 거기다 플러스 커스텀으로 add할것을 추가한다
+                    @Override
+                    public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
+                        //세션 무효화 처리는 이미 다른 핸들러에서 하고있지만 한번 더 추가해봄
+                        HttpSession session = request.getSession();
+                        session.invalidate();
+                    }
+                })
+                .logoutSuccessHandler(new LogoutSuccessHandler() {   //logoutSuccessUrl은 그냥 이동만 하고 이 핸들러는 좀더 다양한 로직 구현 가능
+                    @Override
+                    public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+                        response.sendRedirect("/login");
+                    }
+                })
+                .deleteCookies("remember-me");    //서버에서 만든 쿠키 삭제
+
+        http
+                .rememberMe()
+                .rememberMeParameter("remember")//기본 디폴트 remember-me
+                .tokenValiditySeconds(3600) //기본은 14일이지만 만료시간 1시간 설정
+                .userDetailsService(userDetailsService); //유저 계정 조회
     }
 }
