@@ -93,9 +93,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         http.sessionManagement()//세션 고정 보호 및 세션정책
             .sessionFixation().changeSessionId()//인증했을때마다 세션 id가 바뀐다. 세션 고정 보호! 디폴트 changeSessionId인데 none 주면 안바뀌어 공격당함
-                //migrateSession = 새로운 세션도 생성되는데 서블릿 3.1이하에서 작동하도록 기본값, newSession = 세션 새롭게 생성되지만, 그 이전의 세션에서 설정한 값들을 새로 설정해야함
+                //migrateSession = 새로운 세션도 생성되는데 서블릿 3.1이하에서 작동하도록 기본값이며 그 이전의 세션에서 설정한 값들을 새로 설정그대로 사용 changeSessionId로 마찬가지이다
+                //newSession = 세션 새롭게 생성되지만, 그 이전의 세션에서 설정한 값들을 새로 설정해야함
             .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED);
-            //디폴트 IF_REQUIRED =필요시 생성, Always = 항상세션 생성,Never = 생성안하고 이미 존재시 사용, stateless=생성하지 않고, 존재해도 사용안함 JWT 인증시의 경우!
+            //디폴트 IF_REQUIRED =필요시 생성, Always = 항상세션 생성, Never = 생성안하고 이미 존재시 사용, stateless=생성하지 않고, 존재해도 사용안함 JWT 인증시의 경우!
 
     }
 }
