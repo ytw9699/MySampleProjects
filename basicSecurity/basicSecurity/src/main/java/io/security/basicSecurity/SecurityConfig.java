@@ -2,6 +2,7 @@ package io.security.basicSecurity;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -27,10 +28,21 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     UserDetailsService userDetailsService;
 
+    @Override//사용자 생성
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.inMemoryAuthentication().withUser("user").password("{noop}1111").roles("USER");//메모리 방식으로 사용자 생성 , noop은 평문으로 비번이 들어감
+        auth.inMemoryAuthentication().withUser("sys").password("{noop}1111").roles("SYS");
+        auth.inMemoryAuthentication().withUser("admin").password("{noop}1111").roles("ADMIN","SYS","USER");
+    }
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
              .authorizeRequests()
+             .antMatchers("/every").permitAll()
+             .antMatchers("/user").hasRole("USER")
+             .antMatchers("/admin/pay").hasRole("ADMIN")//아래 설정보다 이렇게 구체적인 설정이 먼저와야한다 안그러면 sys도 이 api에 접근가능하게되버림
+             .antMatchers("/admin/**").access("hasRole('ADMIN') or hasRole('SYS')")
              .anyRequest().authenticated();//어떤요청에도 인증을 요구
 
         http
@@ -97,6 +109,5 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 //newSession = 세션 새롭게 생성되지만, 그 이전의 세션에서 설정한 값들을 새로 설정해야함
             .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED);
             //디폴트 IF_REQUIRED =필요시 생성, Always = 항상세션 생성, Never = 생성안하고 이미 존재시 사용, stateless=생성하지 않고, 존재해도 사용안함 JWT 인증시의 경우!
-
     }
 }
