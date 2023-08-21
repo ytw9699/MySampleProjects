@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Websocket ChatRoom</title>
+    <meta charset="utf-8">
+</head>
+<body>
+<div class="container" style="margin-left: 40%; margin-top: 10%;">
+        <div class="input-group-prepend">
+            <label class="input-group-text">채팅 내용 보내기 테스트</label>
+        </div>
+        <input type="text" id="content1" class="form-control">
+        <div class="input-group-append">
+            <button class="btn btn-primary" type="button" onclick="sendMessage()">채팅 입력 1번</button>
+        </div>
+        <input type="text" id="content2"  class="form-control">
+        <div class="input-group-append">
+            <button class="btn btn-primary" type="button" onclick="sendMessage2()">채팅 입력 2번</button>
+        </div>
+        <div id = "chatContent" style="border: 1px solid; width: 50%;">
+        </div>
+    </div>
+</div>
+<!-- JavaScript -->
+<script src="/webjars/sockjs-client/1.1.2/sockjs.min.js"></script>
+<script src="/webjars/stomp-websocket/2.3.3-1/stomp.min.js"></script>
+<script>
+
+    /*<![CDATA[*/
+        const roomId = [[${roomId}]];
+        const sender = 'admin';
+    /*]]>*/
+
+    var sock = new SockJS("/ws/stomp");
+    var ws = Stomp.over(sock);
+    var reconnect = 0;
+
+    function sendMessage() {
+        console.log("sendMessage ==============================");
+        ws.send("/app/chat/message", {}, JSON.stringify({type:'TALK', roomId:roomId, sender:sender, message:document.getElementById("content1").value}));
+    }
+
+    function sendMessage2() {
+        console.log("sendMessage2 ==============================");
+        ws.send("/app/chat/message2/"+roomId, {}, JSON.stringify({type:'TALK', roomId:roomId, sender:sender, message:document.getElementById("content2").value}));
+    }
+
+    function connect() {
+
+        ws.connect({}, function(frame) {
+
+            ws.subscribe("/topic/chat/room/"+roomId, function(message) {
+                var getMassage = JSON.parse(message.body);
+                console.log("getMassage ==============================");
+                console.log(getMassage);
+                document.getElementById("chatContent").innerHTML =
+                                document.getElementById("chatContent").innerHTML+"<br/>"+getMassage.message;
+                console.log("getMassage ==============================");
+            });
+
+            ws.send("/app/chat/message", {}, JSON.stringify({type:'ENTER', roomId:roomId, sender:sender}));
+
+        }, function(error) {
+            if(reconnect++ <= 5) {
+                setTimeout(function() {
+                    console.log("connection reconnect");
+                    sock = new SockJS("/ws/stomp");
+                    ws = Stomp.over(sock);
+                    connect();
+                },10*1000);
+            }
+        });
+    }
+
+    connect();
+
+</script>
+</body>
+</html>
