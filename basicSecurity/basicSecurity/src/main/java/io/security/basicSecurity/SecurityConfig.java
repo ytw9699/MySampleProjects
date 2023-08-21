@@ -88,7 +88,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.sessionManagement() //동시 세션 제어
             //.invalidSessionUrl("/invalid")//세션이 유효하지 않을때 이동할 페이지 , 만약 expiredUrl과 둘다 설정시에는 이설정이 우선순위 높음
             .maximumSessions(1) //세션 개수 1개로 제한 -1은 무한대
-            .maxSessionsPreventsLogin(true);//최대 세션 개수 초과될때의 경우이다 // 디폴트 false이면 기존 세션이 만료된다. true 주면 로그인 자체를 더 못한다.
+            .maxSessionsPreventsLogin(false);//최대 세션 개수 초과될때의 경우이다 // 디폴트 false이면 기존 세션이 만료된다. true 주면 로그인 자체를 더 못한다.
             //.expiredUrl("/expired") // 세션이 만료된 경우 이동할 페이지
 
         http.sessionManagement()//세션 고정 보호 및 세션정책
