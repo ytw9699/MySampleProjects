@@ -17,7 +17,7 @@ public class RedisSubService {
     private final SimpMessageSendingOperations sendingOperation;
 
     /**
-     * Chat 메세지를 전송합니다.
+     * 레디스 구독하고 있다가 stomp로 publish : Chat 메세지를 전송합니다.
      */
     public void chatSend(String publishMessage) throws JsonProcessingException {
 
