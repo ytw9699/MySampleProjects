@@ -35,4 +35,9 @@ public class SecurityController {
     public String every(){
         return "every";
     }
+
+    @GetMapping("/login")
+    public String login(){
+        return "Access id denided";
+    }
 }

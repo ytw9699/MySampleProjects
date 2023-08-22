@@ -2,6 +2,7 @@ package io.security.basicSecurity;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -10,10 +11,15 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
+import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
+import org.springframework.security.web.savedrequest.RequestCache;
+import org.springframework.security.web.savedrequest.SavedRequest;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -58,7 +64,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     @Override
                     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
                         System.out.println("authentication = " + authentication.getName());  //인증에 성공한 유저 네임 ,    //authentication 은 로그인 성공시 인증한 결과를 담는다
-                        response.sendRedirect("/"); //인증 성공뒤 루트페이지로 이동
+                        //response.sendRedirect("/"); //인증 성공뒤 루트페이지로 이동
+                        RequestCache requestCache = new HttpSessionRequestCache();
+                        SavedRequest savedRequest = requestCache.getRequest(request, response);
+                        String redirectUrl = savedRequest.getRedirectUrl();
+                        response.sendRedirect(redirectUrl);
                     }
                 })
                 .failureHandler(new AuthenticationFailureHandler() {  //실패했을경우 이 handler 호출
@@ -109,5 +119,22 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 //newSession = 세션 새롭게 생성되지만, 그 이전의 세션에서 설정한 값들을 새로 설정해야함
             .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED);
             //디폴트 IF_REQUIRED =필요시 생성, Always = 항상세션 생성, Never = 생성안하고 이미 존재시 사용, stateless=생성하지 않고, 존재해도 사용안함 JWT 인증시의 경우!
+
+        http
+                .exceptionHandling()
+                .authenticationEntryPoint(new AuthenticationEntryPoint() { //인증예외 발생시 후처리 커스텀
+                    @Override
+                    public void commence(HttpServletRequest httpServletRequest, HttpServletResponse response, AuthenticationException e) throws IOException, ServletException {
+                        response.sendRedirect("/login");//내가만든 로그인 페이지로 이동된다.
+                    }
+                })
+                .accessDeniedHandler(new AccessDeniedHandler() { //인가예외 발생시 후처리 커스텀
+                    @Override
+                    public void handle(HttpServletRequest httpServletRequest, HttpServletResponse response, AccessDeniedException e) throws IOException, ServletException {
+                        response.sendRedirect("/denied");
+                    }
+                });
+
+
     }
 }
