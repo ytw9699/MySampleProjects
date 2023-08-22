@@ -18,6 +18,6 @@ class RedisPubServiceTest {
                     chatMessage.setContent("test content");
                     chatMessage.setSender("test sender");
 
-        redisPubService.sendMessage(chatMessage);
+        redisPubService.sendChatMessage(chatMessage);
     }
 }

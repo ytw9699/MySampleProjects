@@ -25,6 +25,6 @@ public class RedisSubService {
 
         log.info("RedisSubscriber - chatMessage => {}", chatMessage);
 
-        sendingOperation.convertAndSend("/topic/chat/room/"+chatMessage.getRoomId(), chatMessage); //pubish
+        sendingOperation.convertAndSend("/topic/chat/room/"+chatMessage.getRoomId(), chatMessage); //stomp pubish
     }
 }
