@@ -8,6 +8,7 @@ import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.stereotype.Component;
+import java.security.Principal;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -19,9 +20,14 @@ public class StompHandler implements ChannelInterceptor {
 
         final StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
 
-        log.info("accessor => {}", accessor);
+        log.info("StompHandler accessor => {}", accessor);
 
         StompCommand command = accessor.getCommand();
+
+        final String destination = accessor.getDestination();
+
+        log.info("destination => {}", destination);
+        log.info("simpSessionId => {}", accessor.getSessionId());
 
         if (command == null) {
             return message;
@@ -30,6 +36,7 @@ public class StompHandler implements ChannelInterceptor {
         switch (command) {
 
             case CONNECT: {
+                log.info("StompHandler - CONNECT => {}", message);
                 break;
             }
             case SUBSCRIBE: {
@@ -37,6 +44,7 @@ public class StompHandler implements ChannelInterceptor {
                 break;
             }
             case UNSUBSCRIBE: {
+                log.info("StompHandler - UNSUBSCRIBE => {}", message);
                 break;
             }
             case DISCONNECT: {
