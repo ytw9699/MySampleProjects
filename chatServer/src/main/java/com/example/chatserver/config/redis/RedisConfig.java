@@ -1,4 +1,5 @@
-package com.example.chatserver.config;
+/*
+package com.example.chatserver.config.redis;
 
 import com.example.chatserver.model.ChatMessage;
 import com.example.chatserver.service.RedisSubService;
@@ -40,7 +41,7 @@ public class RedisConfig {
     @Bean
     RedisMessageListenerContainer redisContainer(@Qualifier("chatListenerAdapter") MessageListenerAdapter chatListenerAdapter) {//컨테이너 설정
 
-        RedisMessageListenerContainer container = new RedisMessageListenerContainer();
+        final RedisMessageListenerContainer container = new RedisMessageListenerContainer();
                                       container.setConnectionFactory(redisConnectionFactory());
                                       container.addMessageListener(chatListenerAdapter, chatTopic());//구독한다
         return container;
@@ -48,6 +49,7 @@ public class RedisConfig {
 
     @Bean
     ChannelTopic chatTopic() {  //pub/sub 토픽 설정
-        return new ChannelTopic("chatSend");
+        return new ChannelTopic("chatTopic");
     }
 }
+*/
