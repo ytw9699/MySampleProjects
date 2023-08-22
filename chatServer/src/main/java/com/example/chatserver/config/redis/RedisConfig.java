@@ -1,4 +1,5 @@
-package com.example.chatserver.config;
+/*
+package com.example.chatserver.config.redis;
 
 import com.example.chatserver.model.ChatMessage;
 import com.example.chatserver.service.RedisSubService;
@@ -51,3 +52,4 @@ public class RedisConfig {
         return new ChannelTopic("chatTopic");
     }
 }
+*/
