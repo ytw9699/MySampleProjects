@@ -1,14 +1,20 @@
 package com.example.chatserver.config;
 
+import com.example.chatserver.stomp.StompHandler;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 
+@RequiredArgsConstructor
 @Configuration
 @EnableWebSocketMessageBroker
 public class StompWebSocketConfig implements WebSocketMessageBrokerConfigurer {
+
+    private final StompHandler stompHandler;
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
@@ -23,5 +29,10 @@ public class StompWebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
         registry.setApplicationDestinationPrefixes("/app");
         //브로커로 보내기전에 가공을 위해 한번 거치어 다른 로직을 실행하기 위함. 다시 최종적으로 내장 브로커 쪽으로 보낼것
+    }
+
+    @Override
+    public void configureClientInboundChannel(ChannelRegistration registration) {
+        registration.interceptors(stompHandler);
     }
 }
