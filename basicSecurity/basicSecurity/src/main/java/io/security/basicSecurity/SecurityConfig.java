@@ -46,6 +46,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http
              .authorizeRequests()
              .antMatchers("/every").permitAll()
+             .antMatchers("/login").permitAll()
              .antMatchers("/user").hasRole("USER")
              .antMatchers("/admin/pay").hasRole("ADMIN")//아래 설정보다 이렇게 구체적인 설정이 먼저와야한다 안그러면 sys도 이 api에 접근가능하게되버림
              .antMatchers("/admin/**").access("hasRole('ADMIN') or hasRole('SYS')")
@@ -66,7 +67,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         System.out.println("authentication = " + authentication.getName());  //인증에 성공한 유저 네임 ,    //authentication 은 로그인 성공시 인증한 결과를 담는다
                         //response.sendRedirect("/"); //인증 성공뒤 루트페이지로 이동
                         RequestCache requestCache = new HttpSessionRequestCache();
-                        SavedRequest savedRequest = requestCache.getRequest(request, response);
+                        SavedRequest savedRequest = requestCache.getRequest(request, response);//세션에서 가져옴
                         String redirectUrl = savedRequest.getRedirectUrl();
                         response.sendRedirect(redirectUrl);
                     }
@@ -83,7 +84,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         http
                 .logout()
-                .logoutUrl("/logout")  //로그아웃은 기본적을 post 방식으로 처리한다, 기본 디폴트 /logout
+                .logoutUrl("/logout")  //로그아웃은 기본적으로 post 방식으로 처리한다, 기본 디폴트 /logout
                 .logoutSuccessUrl("login")
                 .addLogoutHandler(new LogoutHandler() { //기존에 로그아웃시 핸들러가 동작하면서 각종처리를 하는데 거기다 플러스 커스텀으로 add할것을 추가한다
                     @Override
@@ -125,7 +126,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authenticationEntryPoint(new AuthenticationEntryPoint() { //인증예외 발생시 후처리 커스텀
                     @Override
                     public void commence(HttpServletRequest httpServletRequest, HttpServletResponse response, AuthenticationException e) throws IOException, ServletException {
-                        response.sendRedirect("/login");//내가만든 로그인 페이지로 이동된다.
+                        response.sendRedirect("/login");//내가만든 로그인 페이지로만 이동된다.
                     }
                 })
                 .accessDeniedHandler(new AccessDeniedHandler() { //인가예외 발생시 후처리 커스텀

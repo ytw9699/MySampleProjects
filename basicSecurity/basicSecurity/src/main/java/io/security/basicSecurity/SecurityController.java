@@ -38,6 +38,11 @@ public class SecurityController {
 
     @GetMapping("/login")
     public String login(){
-        return "Access id denided";
+        return "login";
+    }
+
+    @GetMapping("/denied")
+    public String denied(){
+        return "denied";
     }
 }
