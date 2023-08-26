@@ -136,6 +136,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     }
                 });
 
+        /*http
+                .csrf().disable(); // 기본 활성화되어있는데 비활성화시킴 */
 
     }
 }
