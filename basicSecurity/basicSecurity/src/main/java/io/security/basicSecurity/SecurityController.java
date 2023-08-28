@@ -31,6 +31,11 @@ public class SecurityController {
         return "admin";
     }
 
+    @GetMapping("/admin2")
+    public String admin2(){
+        return "admin2";
+    }
+
     @GetMapping("/every")
     public String every(){
         return "every";
